@@ -1,31 +1,25 @@
-use std::collections::HashMap;
-
+use crate::libs::standards::inject_module;
 pub enum ResultCommand {
     Continue,
-    Executed,
     Exit,
     Error,
 }
 
-pub fn execute_command(commands: Vec<String>) -> (ResultCommand, &'static str) {
+pub type CommandFn = fn(&[String]) -> (ResultCommand, String);
+
+pub fn execute_command(commands: Vec<String>) -> (ResultCommand, String) {
     if commands.is_empty() {
-        return (ResultCommand::Continue, "Empty");
+        return (ResultCommand::Continue, "Empty".to_string());
     }
 
-    let mut commands_package: HashMap<&str, fn(&[String]) -> (ResultCommand, &'static str)> =
-        HashMap::new();
-    commands_package.insert("exit", exit_shell);
+    let standard_modules = inject_module();
 
     let command = &commands[0];
     let args = &commands[1..];
 
-    let Some(selected_function) = commands_package.get(&command.as_str()) else {
-        return (ResultCommand::Error, "Something Bad Happened");
+    let Some(selected_function) = standard_modules.get(&command.as_str()) else {
+        return (ResultCommand::Error, "Something Bad Happened".to_string());
     };
 
     selected_function(args)
-}
-
-fn exit_shell(_args: &[String]) -> (ResultCommand, &'static str) {
-    (ResultCommand::Exit, "Exited Successfully")
 }

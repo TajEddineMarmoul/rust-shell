@@ -3,8 +3,10 @@ use std::{
     println,
 };
 
-use crate::commands::{ResultCommand, execute_command};
 mod commands;
+pub mod libs;
+
+use crate::commands::{ResultCommand, execute_command};
 mod tokenizer;
 fn main() {
     loop {
