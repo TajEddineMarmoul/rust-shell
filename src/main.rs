@@ -14,7 +14,7 @@ fn main() {
 
         let commands = get_commands();
 
-        let (result_execution, result_comment) = execute_command(commands);
+        let (result_execution, result_comment) = execute_command(&commands);
         match result_execution {
             ResultCommand::Exit => {
                 println!("{result_comment}");

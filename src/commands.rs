@@ -7,7 +7,7 @@ pub enum ResultCommand {
 
 pub type CommandFn = fn(&[String]) -> (ResultCommand, String);
 
-pub fn execute_command(commands: Vec<String>) -> (ResultCommand, String) {
+pub fn execute_command(commands: &[String]) -> (ResultCommand, String) {
     if commands.is_empty() {
         return (ResultCommand::Continue, "Empty".to_string());
     }
