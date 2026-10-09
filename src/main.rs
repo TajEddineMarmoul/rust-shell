@@ -3,18 +3,22 @@ use std::{
     println,
 };
 
-mod commands;
 pub mod libs;
+mod registry;
 
-use crate::commands::{ResultCommand, execute_command};
+use crate::libs::{command::ResultCommand, standards::inject_module};
 mod tokenizer;
 fn main() {
+    let mut registry = registry::Registry::new();
+
+    registry.register_all(inject_module());
+
     loop {
         initiate_shell();
 
         let commands = get_commands();
 
-        let (result_execution, result_comment) = execute_command(&commands);
+        let (result_execution, result_comment) = registry.execute(&commands);
         match result_execution {
             ResultCommand::Exit => {
                 println!("{result_comment}");

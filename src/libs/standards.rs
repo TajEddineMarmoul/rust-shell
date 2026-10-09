@@ -1,19 +1,37 @@
-use std::collections::HashMap;
+use std::vec;
 
-use crate::commands::{CommandFn, ResultCommand};
+use crate::libs::command::{Command, ResultCommand};
 
-pub fn inject_module() -> HashMap<&'static str, CommandFn> {
-    let mut commands_package: HashMap<&'static str, CommandFn> = HashMap::new();
-    commands_package.insert("exit", exit_shell);
-    commands_package.insert("echo", echo);
-    commands_package
+pub fn inject_module() -> Vec<Box<dyn Command>> {
+    let mut commands: Vec<Box<dyn Command>> = vec![];
+
+    commands.push(Box::new(ExitCommand));
+    commands.push(Box::new(EchoCommand));
+
+    commands
 }
 
-fn exit_shell(_args: &[String]) -> (ResultCommand, String) {
-    (ResultCommand::Exit, "Exited Successfully".to_string())
+pub struct ExitCommand;
+
+impl Command for ExitCommand {
+    fn name(&self) -> &str {
+        "exit"
+    }
+
+    fn execute(&self, _args: &[String]) -> (ResultCommand, String) {
+        (ResultCommand::Exit, "Exited Successfully".to_string())
+    }
 }
 
-fn echo(args: &[String]) -> (ResultCommand, String) {
-    let joined = args.join(" ");
-    (ResultCommand::Continue, joined)
+pub struct EchoCommand;
+
+impl Command for EchoCommand {
+    fn name(&self) -> &str {
+        "echo"
+    }
+
+    fn execute(&self, args: &[String]) -> (ResultCommand, String) {
+        let joined = args.join(" ");
+        (ResultCommand::Continue, joined)
+    }
 }
