@@ -1,3 +1,5 @@
+use crate::shell_metadata::ShellState;
+
 pub enum ResultCommand {
     Continue,
     Exit,
@@ -5,5 +7,5 @@ pub enum ResultCommand {
 }
 pub trait Command {
     fn name(&self) -> &str;
-    fn execute(&self, args: &[String]) -> (ResultCommand, String);
+    fn execute(&self, args: &[String], shell: &mut ShellState) -> (ResultCommand, String);
 }

@@ -1,15 +1,21 @@
 use std::collections::HashMap;
 
-use crate::libs::command::{Command, ResultCommand};
+use crate::{
+    libs::command::{Command, ResultCommand},
+    shell_metadata::ShellState,
+};
 
 pub struct Registry {
     commands: HashMap<String, Box<dyn Command>>,
+    shell: ShellState,
 }
-
 impl Registry {
     pub fn new() -> Self {
         Self {
             commands: HashMap::new(),
+            shell: ShellState {
+                cwd: std::env::current_dir().unwrap(),
+            },
         }
     }
 
@@ -23,7 +29,7 @@ impl Registry {
         self.commands.insert(command.name().to_string(), command);
     }
 
-    pub fn execute(&self, commands: &[String]) -> (ResultCommand, String) {
+    pub fn execute(&mut self, commands: &[String]) -> (ResultCommand, String) {
         if commands.is_empty() {
             return (ResultCommand::Continue, "Empty".to_string());
         }
@@ -38,6 +44,6 @@ impl Registry {
             );
         };
 
-        selected_command.execute(args)
+        selected_command.execute(args, &mut self.shell)
     }
 }
