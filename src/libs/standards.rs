@@ -2,7 +2,7 @@ use std::{path::PathBuf, vec};
 
 use crate::{
     libs::command::{Command, ResultCommand},
-    shell_metadata::{self, ShellState},
+    shell_metadata::ShellState,
 };
 
 pub fn inject_module() -> Vec<Box<dyn Command>> {
@@ -21,7 +21,7 @@ impl Command for ExitCommand {
         "exit"
     }
 
-    fn execute(&self, _args: &[String], shell: &mut ShellState) -> (ResultCommand, String) {
+    fn execute(&self, _args: &[String], _shell: &mut ShellState) -> (ResultCommand, String) {
         (ResultCommand::Exit, "Exited Successfully".to_string())
     }
 }
@@ -33,7 +33,7 @@ impl Command for EchoCommand {
         "echo"
     }
 
-    fn execute(&self, args: &[String], shell: &mut ShellState) -> (ResultCommand, String) {
+    fn execute(&self, args: &[String], _shell: &mut ShellState) -> (ResultCommand, String) {
         let joined = args.join(" ");
 
         (ResultCommand::Continue, joined)
@@ -60,11 +60,12 @@ impl Command for CdCommand {
             shell.cwd.join(selected_path)
         };
 
-        if !final_path.exists() {
-            return (ResultCommand::Error, "Path does't exist".to_string());
+        match final_path.canonicalize() {
+            Ok(resolved) => {
+                shell.cwd = resolved;
+                (ResultCommand::Continue, String::new())
+            }
+            Err(e) => (ResultCommand::Error, format!("cd failed : {e}")),
         }
-
-        shell.cwd = final_path;
-        (ResultCommand::Continue, "".to_string())
     }
 }

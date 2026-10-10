@@ -19,6 +19,9 @@ impl Registry {
         }
     }
 
+    pub fn get_shell(&self) -> &ShellState {
+        &self.shell
+    }
     pub fn register_all(&mut self, commands: Vec<Box<dyn Command>>) {
         for command in commands {
             self.register(command);

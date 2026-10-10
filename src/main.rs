@@ -3,11 +3,13 @@ use std::{
     println,
 };
 
-mod Registry;
 pub mod libs;
 mod registry;
 pub mod shell_metadata;
-use crate::libs::{command::ResultCommand, standards::inject_module};
+use crate::{
+    libs::{command::ResultCommand, standards::inject_module},
+    shell_metadata::ShellState,
+};
 mod tokenizer;
 fn main() {
     let mut loaded_registry = registry::Registry::new();
@@ -15,7 +17,7 @@ fn main() {
     loaded_registry.register_all(inject_module());
 
     loop {
-        initiate_shell();
+        initiate_shell(loaded_registry.get_shell());
 
         let commands = get_commands();
 
@@ -50,7 +52,9 @@ fn read_input() -> String {
     input
 }
 
-fn initiate_shell() {
+fn initiate_shell(shell: &ShellState) {
+    let cwd = shell.cwd.display();
+    print!(" shell: {cwd}");
     print!("> ");
     io::stdout().flush().unwrap();
 }
